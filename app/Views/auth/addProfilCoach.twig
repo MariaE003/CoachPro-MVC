@@ -1,0 +1,114 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Complete Profil {% endblock %}
+
+{% block content %}
+
+<section class="flex-1 flex items-center justify-center py-12">
+<div class="container mx-auto px-4 max-w-5xl">
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden grid md:grid-cols-2">
+
+    <!-- Image / Info -->
+    <div class="bg-green-600 text-white p-10 flex flex-col justify-center">
+      <div class="text-center">
+        <i class="fas fa-chalkboard-teacher text-5xl mb-4"></i>
+        <h2 class="text-3xl font-bold mb-2">Complétez votre profil Coach</h2>
+        <p>Ajoutez vos expériences, spécialités et certifications</p>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="p-10">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">Profil Coach</h1>
+      <!-- erreur -->
+      <form method="POST" action="CoachPro-MVC/public/addProfilCoach/store" enctype="multipart/form-data" class="space-y-4">
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Années d'expérience</label>
+          <input type="number" name="experience" min="0" placeholder="Ex: 5" 
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Photo</label>
+          <!-- <input type="file" name="photo" accept="image/*" class="w-full" required> -->
+          <input type="url" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" name="photo"  class="w-full" required>
+        </div>
+
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Bio</label>
+          <textarea name="bio" rows="3" placeholder="Présentez-vous..." 
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required></textarea>
+        </div>
+        <!-- prix -->
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Prix</label>
+          <input type="text" name="prix" min="50" placeholder="Ex: 200" 
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+        
+        </div>
+
+        <!-- Spécialités dynamiques -->
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Spécialités</label>
+          <div id="specialitesContainer" class="space-y-2">
+            <div class="flex space-x-2">
+              <input type="text" name="specialites[]" placeholder="Nom de spécialité" 
+                class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+              <button type="button" onclick="addSpecialite()" class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certifications dynamiques -->
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700">Certifications</label>
+          <div id="certificationsContainer" class="space-y-2">
+            <div class="flex flex-wrap space-y-2 space-x-2">
+              <input type="text" name="certifications[nom][]" placeholder="Nom certification" 
+                class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+              <input type="text" name="certifications[annee][]" placeholder="Année" 
+                class="w-24 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"><br>
+              <input type="text" name="certifications[etablissement][]" placeholder="Établissement" 
+                class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+              <button type="button" onclick="addCertification()" class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+</button>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" name="submitProfil" 
+          class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center space-x-2">
+          <i class="fas fa-save"></i>
+          <span>Enregistrer Profil</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<script>
+function addSpecialite(){
+  const container = document.getElementById('specialitesContainer');
+  const div = document.createElement('div');
+  div.className = 'flex space-x-2';
+  div.innerHTML = `<input type="text" name="specialites[]" placeholder="Nom de spécialité" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                   <button type="button" onclick="this.parentNode.remove()" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">−</button>`;
+  container.appendChild(div);
+}
+
+function addCertification(){
+  const container = document.getElementById('certificationsContainer');
+  const div = document.createElement('div');
+  div.className = 'flex space-x-2';
+  div.innerHTML = `
+    <input type="text" name="certifications[nom][]" placeholder="Nom certification" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+    <input type="text" name="certifications[annee][]" placeholder="Année" class="w-24 border border-gray-300 rounded-lg px-2 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+    <input type="text" name="certifications[etablissement][]" placeholder="Établissement" class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+    <button type="button" onclick="this.parentNode.remove()" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">−</button>
+  `;
+  container.appendChild(div);
+}
+</script>
+
+{% endblock %}

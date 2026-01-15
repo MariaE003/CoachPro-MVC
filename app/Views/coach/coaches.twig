@@ -1,0 +1,84 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Nos Coachs{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<section class="bg-primary text-white py-20">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h1 class="text-4xl font-extrabold mb-4">Nos Coachs Professionnels</h1>
+    <p class="text-gray-300 max-w-2xl mx-auto">
+      Sélectionnez le coach idéal selon votre discipline, niveau et objectifs.
+    </p>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<section class="max-w-7xl mx-auto px-6 -mt-10">
+  <div class="bg-white shadow-lg rounded-xl p-6 grid md:grid-cols-4 gap-4">
+    <input class="border rounded-lg px-4 py-3 focus:ring-2 focus:ring-accent outline-none"
+           placeholder="Rechercher un coach...">
+
+    <select class="border rounded-lg px-4 py-3">
+      <option>Toutes disciplines</option>
+    </select>
+
+    <select class="border rounded-lg px-4 py-3">
+      <option>Toutes notes</option>
+    </select>
+
+    <button class="border border-primary rounded-lg px-4 py-3 hover:bg-primary hover:text-white transition">
+      Réinitialiser
+    </button>
+  </div>
+</section>
+
+<!-- COACHS GRID -->
+<section class="max-w-7xl mx-auto px-6 py-20">
+  <div class="grid md:grid-cols-3 gap-10">
+
+    {% for coa in coachs %}
+    <div class="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden">
+
+      <div class="relative">
+        <img src="{{ coa.photo }}" class="w-full h-60 object-cover">
+        <span class="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
+          Certifié
+        </span>
+      </div>
+
+      <div class="p-6">
+        <h3 class="text-xl font-bold mb-1">
+          {{ coa.nom }} {{ coa.prenom }}
+        </h3>
+
+        <p class="text-gray-500 mb-3">
+          <i class="fas fa-dumbbell text-accent"></i>
+          {{ coa.specialite }}
+        </p>
+
+        <div class="flex justify-between text-sm text-gray-500 mb-4">
+          <span><i class="fas fa-clock"></i> {{ coa.experience_en_annee }} ans</span>
+          <span><i class="fas fa-users"></i> 250+ sportifs</span>
+        </div>
+
+        <div class="flex justify-between items-center">
+          <span class="text-lg font-bold text-primary">
+            {{ coa.prix }}
+          </span>
+
+          <a href="/coach/profile/{{ coa.id }}"
+             class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+            Voir profil
+          </a>
+        </div>
+      </div>
+
+    </div>
+    {% endfor %}
+
+  </div>
+</section>
+
+{% endblock %}
