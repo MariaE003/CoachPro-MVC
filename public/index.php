@@ -4,6 +4,8 @@ require_once '../app/Controllers/UserController.php';
 require_once '../app/Controllers/CoachController.php';
 require_once '../app/Controllers/DisponibiliteController.php';
 require_once '../app/Controllers/RservationController.php';
+require_once '../app/Controllers/ClientController.php';
+
 require_once '../core/Session.php';
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
@@ -109,8 +111,6 @@ if ($uri === '/mes-reservations') {
 }
 
 
-// les reservation pour coach
-// public/index.php
 
 
 if ($uri === '/coach/reservations') {
@@ -144,8 +144,27 @@ if ($uri === '/coach/reservation/annuler' && $_SERVER['REQUEST_METHOD'] === 'POS
 }
 
 
+// leprofil du sportif
+
+if ($uri === '/sportif-profil') {
+    $controller = new ClientController($twig);
+    $controller->profilClient();
+    exit;
+}
+
+if ($uri === '/profil-coach') {
+    $controller = new CoachController($twig);
+    $id_user;
+    $controller->profileCoachP();
+    exit;
+}
 
 
+
+if ($uri === '/coach/dashboard') {
+    $controller = new CoachController($twig);
+    echo $controller->dashboardCoach();
+}
 
 // echo $_SESSION["user_id"];
 

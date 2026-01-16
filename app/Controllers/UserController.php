@@ -8,7 +8,7 @@ require_once __DIR__.'/../../config/DataBase.php';
 class UserController {
 
      private $twig;
-     protected $pdo; // <-- ajoute ça en haut de la classe
+     
 
         public function __construct($twig) {
             $this->twig = $twig;
@@ -97,6 +97,7 @@ class UserController {
             exit();
         }
         }
+
 
     
 }

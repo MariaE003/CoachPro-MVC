@@ -26,27 +26,13 @@ class DisponibiliteController {
 
         // ajou
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
-            if (
-                empty($_POST['date']) ||
-                empty($_POST['startTime']) ||
-                empty($_POST['endTime'])
-            ) {
-                $error = "Tous les champs sont obligatoires";
-            } elseif ($dispo->dispoExist(
-                $idCoach,
-                $_POST['date'],
-                $_POST['startTime'],
-                $_POST['endTime']
-            )) {
-                $error = "Ce créneau existe déjà";
+            if (empty($_POST['date']) ||empty($_POST['startTime']) ||empty($_POST['endTime'])) {
+                $error = "tous les champs sont obligatoire";
+            } elseif ($dispo->dispoExist($idCoach,$_POST['date'], $_POST['startTime'],$_POST['endTime'])) {
+                $error = "Ce creneau est  existe deja";
             } else {
-                $dispo->ajouterDispo(
-                    $idCoach,
-                    $_POST['date'],
-                    $_POST['startTime'],
-                    $_POST['endTime']
-                );
-                header("Location: /coach/disponibilites");
+                $dispo->ajouterDispo($idCoach, $_POST['date'],$_POST['startTime'],$_POST['endTime']);
+                header("Location: /CoachPro-MVC/public/coach/disponibilites");
                 exit;
             }
         }
@@ -54,7 +40,7 @@ class DisponibiliteController {
         // supprimer
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler'])) {
             $dispo->supprimer((int)$_POST['annuler']);
-            header("Location: /coach/disponibilites");
+            header("Location: /CoachPro-MVC/public/coach/disponibilites");
             exit;
         }
 

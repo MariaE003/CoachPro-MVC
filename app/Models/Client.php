@@ -62,6 +62,12 @@ class Client extends User{
             echo "non";
         }
         }
+    public function profilSportif($clientId){
+        $req = $this->pdo->prepare("SELECT * FROM client WHERE id = ?");
+        $req->execute([$clientId]);
+        $clientInfo = $req->fetch(PDO::FETCH_ASSOC);
+        return $clientInfo;
+    }
 }
 
 ?>

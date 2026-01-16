@@ -66,51 +66,68 @@ class CoachController{
     }
 
     // le profil du coach
-    public function profileCoach(int $id)
-    {
-        $coach = new Coach();
-        $coachs = $coach->detailCoach($id);
+    public function profileCoachP() {
+        $id_user=$_SESSION["user_id"];
+    $coach = new Coach();
+    $profil = $coach->afficherProfil($id_user);
 
-        if (!$coachs) {
-            echo "Coach introuvable";
-            return;
-        }
-    // specialites
-    // $rawSpecialites = $coach->getSpecialite(); 
-    // if (is_string($rawSpecialites)) {
-    //     $specialites = explode(',', $rawSpecialites);
-    // } elseif (is_array($rawSpecialites)) {
-    //     $specialites = $rawSpecialites;
-    // } else {
-    //     $specialites = [];
-    // }
-    $specialites = isset($coachs['specialites']) ? explode(',', $coachs['specialites']) : [];
+    $specialites = !empty($profil['specialite']) ? explode(',', $profil['specialite']) : [];
+    $certifNom = !empty($profil['nom_certif']) ? explode(',', $profil['nom_certif']) : [];
+    $certifAnnee = !empty($profil['annee']) ? explode(',', $profil['annee']) : [];
+    $certifEtabli = !empty($profil['etablissement']) ? explode(',', $profil['etablissement']) : [];
 
-    // certif
-    $certif = $coach->CertifCoach($id);
-
-    // var_dump($certif);
-    // $test=explode(', ', $certif['nomcertif']);
-    // var_dump($test);
-    if ($certif) {
-    $nomCertif = explode(', ', $certif['nomcertif']);
-    $etablissements = explode(', ', $certif['etablissement']);
-    $annees =  explode(', ', $certif['anneecertif']) ;
-    } else {
-        $nomCertif = [];
-        $etablissements = [];
-        $annees = [];
-    }
-    echo $this->twig->render('coach/coach-profile.twig', [
-        'coach'          => $coachs,
-        'specialites'    => $specialites,
-        'nomCertif'      => $nomCertif,
-        'etablissements' => $etablissements,
-        'annee'         => $annees,
-        'idcoach'        => $id,
+    echo $this->twig->render('coach/profil-du-coach.twig', [
+        'profil' => $profil,
+        'specialites' => $specialites,
+        'certifNom' => $certifNom,
+        'certifAnnee' => $certifAnnee,
+        'certifEtabli' => $certifEtabli,
+        'erreur' => $erreur ?? '',
     ]);
-    }
+}
+// profil =>pour client
+public function profileCoach($idCoach) {
+    $coach = new Coach();
+    $profil = $coach->detailCoach($idCoach); 
 
+    $specialites = !empty($profil['specialites']) ? explode(',', $profil['specialites']) : [];
+    $certif=$coach->CertifCoach($idCoach);
+    $certifNom = explode(',', $certif['nom_certif']);
+    $certifAnnee = !empty($profil['annee']) ? explode(',', $profil['annee']) : [];
+    $certifEtabli = !empty($profil['etablissement']) ? explode(',', $profil['etablissement']) : [];
+    
+    echo $this->twig->render('coach/coach-profile.twig', [
+        'profil' => $profil,
+        'specialites' => $specialites,
+        'nomCertif'=>$certifNom,
+        'etablissements'=>$certifEtabli,
+        'annee'=>$certifAnnee,
+    ]);
+}
+
+
+
+
+public function dashboardCoach() {
+    $idUser = $_SESSION['user_id'];
+
+    $coach = new Coach();
+    $idCoach = $coach->leCoachConne($idUser);
+
+    $nbrResAtt = $coach->nbrReservationEnAttente($idCoach);
+    $nbrResAcc = $coach->nrbReseValide($idCoach);
+    $nbrdmain  = $coach->nbrResDemain($idCoach);
+    $nextSeance = $coach->prochaineRese($idCoach);
+    $profil = $coach->detailCoach($idCoach);
+
+    return $this->twig->render('coach/coach-dashboard.twig', [
+        'nbrResAtt' => $nbrResAtt,
+        'nbrResAcc' => $nbrResAcc,
+        'nbrdmain' => $nbrdmain,
+        'nextSeance' => $nextSeance,
+        'coach' => $profil
+    ]);
+}
 
 
 

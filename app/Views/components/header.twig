@@ -14,14 +14,14 @@
       {% if isLogged and role == 'coach' %}
         <a href="/CoachPro-MVC/public/coach/reservations" class="hover:text-accent">Mes Réservations (coach)</a>
         <a href="/CoachPro-MVC/public/coach/disponibilites" class="hover:text-accent">Disponibilités</a>
-        <a href="/CoachPro-MVC/public/addProfilCoach" class="hover:text-accent">Dashboard</a>
+        <a href="/CoachPro-MVC/public/coach/dashboard" class="hover:text-accent">Dashboard</a>
       {% endif %}
 
     </nav>
 
     <div class="hidden md:flex gap-3">
       {% if isLogged and role == 'client' %}
-        <a href="/CoachPro-MVC/public/profil-client" 
+        <a href="/CoachPro-MVC/public/sportif-profil" 
            class="nav-btn px-3 py-1 rounded-lg hover:bg-blue-100 transition cursor-pointer">
            Profil
         </a>

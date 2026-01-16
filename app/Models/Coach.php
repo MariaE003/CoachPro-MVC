@@ -157,10 +157,6 @@ public function virifierSiCoachCompleterProfil(int $userid){
     ]);
 
     $res1=$req->fetch(PDO::FETCH_ASSOC);
-    // echo $res1["id"];
-    // if ($res1['experience_en_annee']!== null){
-    //     return true;
-    // }
     if (!$res1) {
         return false;
     }
@@ -229,7 +225,7 @@ $reqCertif->execute([
     }
 // les seance accepter ce jour 
 public function nrbReseValide($idCoach){
-    $req=$this->pdo->prepare("SELECT count(*) as nbr from reservation where id_coach=? and status='accepter' and date=CURDATE()");
+    $req=$this->pdo->prepare("SELECT count(*) as nbr from reservation where id_coach=? and status='accepter' and date=CURRENT_DATE");
     $req->execute([$idCoach]);
     return $req->fetch();
 }
@@ -238,9 +234,11 @@ public function nrbReseValide($idCoach){
 
 public function nbrResDemain($idCoach) {
         $req = $this->pdo->prepare(
-            "SELECT COUNT(*) as nbr FROM reservation 
-             WHERE id_coach=? AND status='accepter' 
-             AND date=CURDATE() + INTERVAL 1 DAY"
+            "SELECT COUNT(*) as nbr 
+            FROM reservation 
+            WHERE id_coach = ? 
+            AND status = 'accepter' 
+            AND date = CURRENT_DATE + INTERVAL '1 day'"
         );
         $req->execute([$idCoach]);
         return $req->fetch();
@@ -249,10 +247,14 @@ public function nbrResDemain($idCoach) {
     
     public function prochaineRese($idCoach) {
         $req = $this->pdo->prepare(
-            "SELECT r.*, u.email FROM reservation r inner join client c ON c.id = r.id_client
-             inner join users u ON u.id = c.id_user WHERE r.id_coach=? AND r.date>=CURDATE()
-             ORDER BY r.date, r.heure_debut 
-             LIMIT 1"
+            "SELECT r.*, u.email 
+            FROM reservation r 
+            INNER JOIN client c ON c.id = r.id_client
+            INNER JOIN users u ON u.id = c.id_user 
+            WHERE r.id_coach = ? 
+            AND r.date >= CURRENT_DATE
+            ORDER BY r.date, r.heure_debut 
+            LIMIT 1"
         );
         $req->execute([$idCoach]);
         return $req->fetch(PDO::FETCH_ASSOC);
@@ -260,34 +262,48 @@ public function nbrResDemain($idCoach) {
 
 
 
+
     public function afficherProfil($idUser) {
-    // le coach et leur specialite
-    $req = $this->pdo->prepare("SELECT c.*,GROUP_CONCAT(s.nom_specialite SEPARATOR ', ') as specialite from coach c 
-    left join specialite_coach sc on sc.id_coach=c.id 
-    left join specialite s on s.id=sc.id_specialite where id_user=? 
-    group by c.id
+    // le coach et leurs spécialités
+    $req = $this->pdo->prepare("
+        SELECT c.*, STRING_AGG(s.nom_specialite, ', ') AS specialite
+        FROM coach c
+        LEFT JOIN specialite_coach sc ON sc.id_coach = c.id
+        LEFT JOIN specialite s ON s.id = sc.id_specialite
+        WHERE c.id_user = ?
+        GROUP BY c.id
     ");
     
     $req->execute([$idUser]);
     $coach = $req->fetch(PDO::FETCH_ASSOC);
-    $idC=$coach['id'];
+
+    if (!$coach) {
+        return null;
+    }
+
+    $idC = $coach['id'];
+
     // Certifications
-    $reqCertif = $this->pdo->prepare("SELECT group_concat(nom_certif separator ',') as nom_certif,group_concat(annee separator ',') 
-                          as annee,group_concat(etablissement separator ',') as etablissement  from certification 
-                          where id_coach=?
-                          group by id_coach");
+    $reqCertif = $this->pdo->prepare("
+        SELECT 
+            STRING_AGG(nom_certif, ',') AS nom_certif,
+            STRING_AGG(annee::text, ',') AS annee,
+            STRING_AGG(etablissement, ',') AS etablissement
+        FROM certification
+        WHERE id_coach = ?
+        GROUP BY id_coach
+    ");
 
     $reqCertif->execute([$idC]);
     $certif = $reqCertif->fetch(PDO::FETCH_ASSOC);
 
-   
-    $coach['nom_certif'] = isset($certif['nom_certif']) ? $certif['nom_certif'] : '';
-    $coach['annee'] = isset($certif['annee']) ? $certif['annee'] : '';
-    $coach['etablissement']= isset($certif['etablissement']) ? $certif['etablissement'] : '';
-
+    $coach['nom_certif'] = $certif['nom_certif'] ?? '';
+    $coach['annee'] = $certif['annee'] ?? '';
+    $coach['etablissement'] = $certif['etablissement'] ?? '';
 
     return $coach;
 }
+
 
 
 }
