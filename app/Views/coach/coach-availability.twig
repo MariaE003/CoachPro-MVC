@@ -1,0 +1,67 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Mes disponibilités{% endblock %}
+
+{% block content %}
+
+<div class="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto my-8">
+  <h2 class="text-xl font-bold mb-4">Ajouter une disponibilité</h2>
+
+  {% if error %}
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="POST" class="space-y-4">
+    <input type="date" name="date" class="w-full border rounded px-4 py-2">
+    <input type="time" name="startTime" class="w-full border rounded px-4 py-2">
+    <input type="time" name="endTime" class="w-full border rounded px-4 py-2">
+
+    <button name="save"
+      class="w-full bg-accent text-white py-2 rounded hover:bg-green-600">
+      Enregistrer
+    </button>
+  </form>
+</div>
+
+<div class="max-w-4xl mx-auto mt-10">
+  <h3 class="font-semibold mb-4">Disponibilités actuelles</h3>
+
+  <table class="min-w-full bg-white shadow rounded">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="px-4 py-2">Date</th>
+        <th class="px-4 py-2">Début</th>
+        <th class="px-4 py-2">Fin</th>
+        <th class="px-4 py-2">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for d in disponibilites %}
+        <tr class="border-t">
+          <td class="px-4 py-2">{{ d.date }}</td>
+          <td class="px-4 py-2">{{ d.heure_debut }}</td>
+          <td class="px-4 py-2">{{ d.heure_fin }}</td>
+          <td class="px-4 py-2 text-center">
+            <form method="POST">
+              <button name="annuler" value="{{ d.id }}"
+                class="text-red-500 hover:underline">
+                Supprimer
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="text-center py-6 text-gray-500">
+            Aucune disponibilité
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

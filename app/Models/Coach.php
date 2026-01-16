@@ -192,7 +192,7 @@ public function detailCoach(int $id) {
         left JOIN specialite_coach sc ON c.id = sc.id_coach
         left JOIN specialite s ON sc.id_specialite = s.id
         WHERE c.id = ?
-        GROUP BY c.id, c.nom, c.prenom, c.prix, c.photo, c.telephone, c.bio, c.experience_en_annee
+        GROUP BY c.id
     ");
     $req->execute([$id]);
     return $req->fetch(PDO::FETCH_ASSOC); 
@@ -205,7 +205,7 @@ public function CertifCoach(int $id) {
 
                         STRING_AGG(ce.etablissement , ', ') AS etablissement,
 
-                        STRING_AGG(ce.annee , ', ') AS anneeCertif 
+                        STRING_AGG(ce.annee::text , ', ') AS anneeCertif 
 
                         FROM coach c
                         inner join certification ce on ce.id_coach=c.id
@@ -267,6 +267,7 @@ public function nbrResDemain($idCoach) {
     left join specialite s on s.id=sc.id_specialite where id_user=? 
     group by c.id
     ");
+    
     $req->execute([$idUser]);
     $coach = $req->fetch(PDO::FETCH_ASSOC);
     $idC=$coach['id'];

@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/config/DataBase.php';
+require_once __DIR__ .'/../../config/DataBase.php';
+
 
 class Disponibilite{
     private $id; 
@@ -37,9 +38,9 @@ class Disponibilite{
     public function AjouterDispo($idCoach, $date, $debut, $fin): bool {
     $req = $this->pdo->prepare(
         "INSERT INTO disponibilite (id_coach, date, heure_debut, heure_fin, disponible)
-         VALUES (?,?,?,?,1)"
+         VALUES (?,?,?,?,?)"
     );
-    return $req->execute([$idCoach, $date, $debut, $fin]);
+    return $req->execute([$idCoach, $date, $debut, $fin,1]);
 }
 
 
@@ -79,7 +80,7 @@ class Disponibilite{
     }
     // 
     public function ModifierStatusDispo($id){
-        $reqDelete=$this->pdo->prepare("UPDATE disponibilite set disponible = 0 where id=?");
+        $reqDelete=$this->pdo->prepare("UPDATE disponibilite set disponible = false where id=?");
         $reqDelete->execute([
             $id
         ]);
@@ -88,7 +89,7 @@ class Disponibilite{
 
 
     public function dispoDuCeCoach(int $idCoach) {
-        $req = $this->pdo->prepare("SELECT * FROM disponibilite WHERE id_coach=? AND disponible=1");
+        $req = $this->pdo->prepare("SELECT * FROM disponibilite WHERE id_coach=? AND disponible=true");
         $req->execute([$idCoach]);
         return $req->fetchAll(PDO::FETCH_ASSOC);
     }

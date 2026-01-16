@@ -1,0 +1,172 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-6 py-16">
+  <h1 class="text-3xl font-bold mb-8">Mes Réservations</h1>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure Début</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure Fin</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% if reservations|length > 0 %}
+          {% for reser in reservations %}
+            <tr>
+              <td class="px-6 py-4">{{ reser.date }}</td>
+              <td class="px-6 py-4">{{ reser.heure_debut }}</td>
+              <td class="px-6 py-4">{{ reser.heure_fin }}</td>
+              <td class="px-6 py-4">{{ reser.prenomClient }} {{ reser.nomClient }}</td>
+              <td class="px-6 py-4">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  {{ reser.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center space-x-2">
+
+                <!-- DETAILS -->
+                <button
+                  data-date="{{ reser.date }}"
+                  data-start="{{ reser.heure_debut }}"
+                  data-end="{{ reser.heure_fin }}"
+                  data-status="{{ reser.status }}"
+                  data-prix="{{ reser.prix }}"
+                  data-objectif="{{ reser.objectif }}"
+                  data-name="{{ reser.prenomClient }} {{ reser.nomClient }}"
+                  data-photo="{{ reser.photo }}"
+                  class="open-modal text-blue-500">
+                  <i class="fas fa-eye"></i>
+                </button>
+
+                <!-- pour accepter -->
+                {#  #}
+                <form action="/CoachPro-MVC/public/coach/reservation/accepter" method="POST" class="inline">
+                <input type="hidden" name="id_reservation" value="{{ reser.id }}">
+                <button class="text-green-500">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+                </form>
+
+                <!-- pour anuuler -->
+               <form action="/CoachPro-MVC/public/coach/reservation/annuler" method="POST" class="inline">
+                <input type="hidden" name="id_reservation" value="{{ reser.id }}">
+                <button onclick="return confirm('Vous voulez vraiment annuler ?')" class="text-red-500">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" class="text-center py-6 text-gray-500">
+              Aucune réservation trouvée
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Modal Overlay -->
+<!-- Modal Overlay -->
+<div id="reservationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl mx-4">
+    <div class="flex justify-between items-center border-b px-6 py-4">
+      <h2 class="text-xl font-bold text-primary">Détails de la réservation</h2>
+      <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="px-6 py-4 space-y-4">
+      <div class="flex items-center space-x-4">
+        <!-- Image corrigée -->
+        <img src="" id="photoModal" alt="Coach" class="rounded-full w-20 h-20 object-cover">
+        <div>
+          <strong class="text-lg" id="nameModal">Mohammed Benali</strong>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-gray-700">
+        <div>
+          <span class="font-semibold">Date :</span> <span id="modalDate"></span>
+        </div>
+        <div>
+          <span class="font-semibold">Heure Début :</span> <span id="modalTimeStart"></span>
+        </div>
+        <div>
+          <span class="font-semibold">Heure Fin :</span> <span id="modalTimeend"></span>
+        </div>
+        <div>
+          <span class="font-semibold">Statut :</span> 
+          <span class="px-2 py-1 rounded-full bg-green-100 text-green-800" id="modalStatus"></span>
+        </div>
+        <div class="col-span-2">
+          <span class="font-semibold">Prix :</span> <span id="modalPrice"></span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-800">Objectif</h3>
+        <p class="text-gray-600" id="modalObjectif"></p>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t flex justify-end">
+      <button id="closeModalBtn" class="btn btn-outline px-4 py-2 rounded-lg hover:bg-primary hover:text-white transition">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById("reservationModal");
+  const closeModal = document.getElementById("closeModal");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+
+  const modalDate = document.getElementById("modalDate");
+  const modalTimeStart = document.getElementById("modalTimeStart");
+  const modalTimeEnd = document.getElementById("modalTimeend");
+  const modalStatus = document.getElementById("modalStatus");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalObjectif = document.getElementById("modalObjectif");
+  const modalName = document.getElementById("nameModal");
+  const modalPhoto = document.getElementById("photoModal");
+
+  document.querySelectorAll(".open-modal").forEach(btn => {
+    btn.addEventListener("click", () => {
+      modalDate.textContent = btn.dataset.date;
+      modalTimeStart.textContent = btn.dataset.start;
+      modalTimeEnd.textContent = btn.dataset.end;
+      modalStatus.textContent = btn.dataset.status;
+      modalPrice.textContent = btn.dataset.prix + " DH";
+      modalObjectif.textContent = btn.dataset.objectif;
+      modalName.textContent = btn.dataset.name;
+      modalPhoto.src = btn.dataset.photo ? btn.dataset.photo : "image.png";
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    });
+  });
+
+  [closeModal, closeModalBtn].forEach(btn => {
+    btn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    });
+  });
+</script>
+{% endblock %}

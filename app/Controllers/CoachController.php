@@ -65,6 +65,51 @@ class CoachController{
         ]);
     }
 
+    // le profil du coach
+    public function profileCoach(int $id)
+    {
+        $coach = new Coach();
+        $coachs = $coach->detailCoach($id);
+
+        if (!$coachs) {
+            echo "Coach introuvable";
+            return;
+        }
+    // specialites
+    // $rawSpecialites = $coach->getSpecialite(); 
+    // if (is_string($rawSpecialites)) {
+    //     $specialites = explode(',', $rawSpecialites);
+    // } elseif (is_array($rawSpecialites)) {
+    //     $specialites = $rawSpecialites;
+    // } else {
+    //     $specialites = [];
+    // }
+    $specialites = isset($coachs['specialites']) ? explode(',', $coachs['specialites']) : [];
+
+    // certif
+    $certif = $coach->CertifCoach($id);
+
+    // var_dump($certif);
+    // $test=explode(', ', $certif['nomcertif']);
+    // var_dump($test);
+    if ($certif) {
+    $nomCertif = explode(', ', $certif['nomcertif']);
+    $etablissements = explode(', ', $certif['etablissement']);
+    $annees =  explode(', ', $certif['anneecertif']) ;
+    } else {
+        $nomCertif = [];
+        $etablissements = [];
+        $annees = [];
+    }
+    echo $this->twig->render('coach/coach-profile.twig', [
+        'coach'          => $coachs,
+        'specialites'    => $specialites,
+        'nomCertif'      => $nomCertif,
+        'etablissements' => $etablissements,
+        'annee'         => $annees,
+        'idcoach'        => $id,
+    ]);
+    }
 
 
 

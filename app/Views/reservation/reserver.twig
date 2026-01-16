@@ -1,0 +1,121 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Réserver une séance{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-6 py-16">
+
+  <a href="/coach/profile?idProfilCoach={{ idCoach }}" class="text-sm text-gray-500 hover:text-accent flex items-center gap-2 mb-6">
+    <i class="fas fa-arrow-left"></i> Retour au profil
+  </a>
+
+  <div class="bg-white rounded-xl shadow p-8 grid md:grid-cols-3 gap-8">
+
+    <div class="md:col-span-2">
+      <h1 class="text-3xl font-bold mb-6">
+        <i class="fas fa-calendar-plus text-accent"></i> Les moments disponibles
+      </h1>
+
+      {% if dispoLignes|length > 0 %}
+        {% for date, times in dispoLignes %}
+          <div class="max-w-3xl mx-auto p-6">
+            <div class="mb-6 bg-white shadow rounded-xl p-5">
+              <h3 class="text-lg font-semibold text-gray-700 mb-4">{{ date }}</h3>
+              <div class="flex flex-wrap gap-3">
+                {% for oneTime in times %}
+                  <button type="button"
+                          class="time px-4 py-2 rounded-lg border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition"
+                          data-date="{{ date }}"
+                          data-start="{{ oneTime.start }}"
+                          data-end="{{ oneTime.end }}"
+                          data-id="{{ oneTime.id }}">
+                    {{ oneTime.start }}-{{ oneTime.end }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="max-w-md mx-auto mt-6 bg-green-50 border border-green-300 text-green-800 px-6 py-4 rounded-xl text-center shadow">
+          Aucun temps disponible pour ce coach
+        </div>
+      {% endif %}
+
+      <h2 class="text-3xl font-bold mb-6">
+        <i class="fas fa-calendar-plus text-accent"></i> Réserver une séance
+      </h2>
+
+      <div id="availabilityAlert" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
+      <form method="POST" class="space-y-6">
+        <input type="hidden" name="idDispo" id="idDispo">
+
+        <div>
+          <label class="block mb-1 font-medium">Date</label>
+          <input type="date" id="date" readonly name="date"
+                 class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-accent">
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">Heure Début</label>
+          <input type="time" id="timeStart" name="Hdebut" readonly
+                 class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-accent">
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">Heure Fin</label>
+          <input type="time" id="timeEnd" name="HFin" readonly
+                 class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-accent">
+        </div>
+
+        <div>
+          <label class="block mb-1 font-medium">Objectifs</label>
+          <textarea rows="3" name="objectif" id="objectif"
+                    class="w-full border rounded-lg px-4 py-2"
+                    placeholder="Perte de poids, technique, endurance..."></textarea>
+        </div>
+
+        <div class="flex gap-4">
+          <button type="submit"
+                  id="confirmBtn"
+                  name="reserver"
+                  disabled
+                  class="px-6 py-3 bg-accent text-white rounded-lg font-semibold">
+            Confirmer réservation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+let dateF = document.querySelector("#date"); 
+let timeStart = document.querySelector("#timeStart"); 
+let timeEnd = document.querySelector("#timeEnd"); 
+let objectif = document.querySelector("#objectif"); 
+let confirmBtn = document.querySelector("#confirmBtn"); 
+let input = document.querySelector("#idDispo"); 
+
+let times = document.querySelectorAll(".time"); 
+times.forEach(btn => {
+    btn.addEventListener("click", () => {
+        let date = btn.dataset.date;
+        let startTime = btn.dataset.start;
+        let endTime = btn.dataset.end;
+        let idDispo = btn.dataset.id;
+
+        dateF.value = date;
+        timeStart.value = startTime;
+        timeEnd.value = endTime;
+        input.value = idDispo;
+
+        confirmBtn.disabled = objectif.value.trim() === "";
+    });
+});
+
+objectif.addEventListener("input", () => {
+    confirmBtn.disabled = !(dateF.value && timeStart.value && timeEnd.value && objectif.value.trim());
+});
+</script>
+{% endblock %}

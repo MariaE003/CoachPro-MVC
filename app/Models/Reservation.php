@@ -61,6 +61,7 @@ class Reservation{
         ]);
         $idDispo = $this->pdo->lastInsertId();
         return $idDispo;
+
     }
 
     public function ModifierReservation(int $idReser){
@@ -79,7 +80,7 @@ class Reservation{
     }
     public function affichierReservation($id_client){
         // $reqSelect=$this->pdo->prepare("SELECT * from reservation");
-        $statusEnAttente="en_attente";
+        $statusEnAttente='en_attente';
         $reqSelect = $this->pdo->prepare("SELECT c.nom, c.prenom, c.prix, c.photo, r.* FROM reservation r 
             INNER JOIN coach c ON r.id_coach=c.id 
             WHERE r.id_client=? AND r.status=? "
@@ -107,9 +108,9 @@ class Reservation{
 
 
     public function afficherDetailReser($id_coach1){
-        $statusEnAttent="en_attente";
+        $statusEnAttent='en_attente';
 
-        $req=$this->pdo->prepare("SELECT c.nom,c.prenom,c.prix,c.photo,cl.nom as 'nomClient',cl.prenom as 'prenomClient',r.* FROM reservation r 
+        $req=$this->pdo->prepare("SELECT c.nom,c.prenom,c.prix,c.photo,cl.nom as nomClient,cl.prenom as prenomClient,r.* FROM reservation r 
         inner join coach c on  r.id_coach=c.id
         inner join client cl on  r.id_client=cl.id
         where c.id=? and r.status=?");
@@ -136,7 +137,7 @@ class Reservation{
         $reqInfo->execute([$idReservation]);
         $info = $reqInfo->fetch(PDO::FETCH_ASSOC);
         if($info){
-            $reqDispo = $this->pdo->prepare("UPDATE disponibilite SET disponible = 1 WHERE id_coach = ? AND date = ? AND heure_debut = ? AND heure_fin = ?");
+            $reqDispo = $this->pdo->prepare("UPDATE disponibilite SET disponible = true WHERE id_coach = ? AND date = ? AND heure_debut = ? AND heure_fin = ?");
             $reqDispo->execute([$info['id_coach'], $info['date'], $info['heure_debut'], $info['heure_fin']]);
         }
     }

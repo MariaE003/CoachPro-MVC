@@ -1,0 +1,152 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-6 py-16">
+  <h1 class="text-3xl font-bold mb-8">Mes Réservations</h1>
+
+  <div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure Début</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure Fin</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Coach</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% if reservations %}
+          {% for res in reservations %}
+          <tr>
+            <td class="px-6 py-4">{{ res.date }}</td>
+            <td class="px-6 py-4">{{ res.heure_debut }}</td>
+            <td class="px-6 py-4">{{ res.heure_fin }}</td>
+            <td class="px-6 py-4">{{ res.prenom }} {{ res.nom }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                {% if res.status == 'en_attente' %} bg-yellow-100 text-yellow-800
+                {% elseif res.status == 'accepter' %} bg-green-100 text-green-800
+                {% else %} bg-red-100 text-red-800
+                {% endif %}">
+                {{ res.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center space-x-2">
+              <!-- Modal Détails -->
+              <button type="button" 
+                      class="text-blue-500 hover:text-blue-700 open-modal"
+                      data-date="{{ res.date }}"
+                      data-start="{{ res.heure_debut }}"
+                      data-end="{{ res.heure_fin }}"
+                      data-name="{{ res.prenom }} {{ res.nom }}"
+                      data-status="{{ res.status }}"
+                      data-prix="{{ res.prix }}"
+                      data-objectif="{{ res.objectif }}"
+                      data-photo="{{ res.photo }}">
+                <i class="fas fa-eye"></i>
+              </button>
+
+              <!-- Annuler -->
+              <form method="POST" action="/CoachPro-MVC/public/mes-reservations" class="inline">
+                <input type="hidden" name="id_reservation" value="{{ res.id }}">
+                <button type="submit"
+                        onclick="return confirm('Voulez-vous vraiment annuler la réservation ?')"
+                        class="text-red-500 hover:text-red-700">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" class="px-4 py-6 text-center text-gray-500">Aucune réservation trouvée.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<!-- Modal Overlay -->
+<div id="reservationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-xl w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 max-w-4xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center border-b px-8 py-6">
+      <h2 class="text-2xl font-bold text-primary">Détails de la réservation</h2>
+      <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-xl">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-8 py-6 space-y-6">
+      <div class="flex items-center space-x-6">
+        <img src="" id="photoModal" alt="Coach" class="rounded-full w-32 h-32 object-cover border-2 border-gray-200">
+        <div>
+          <strong class="text-2xl" id="nameModal"></strong>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6 text-gray-700">
+        <div><span class="font-semibold">Date :</span> <span id="modalDate"></span></div>
+        <div><span class="font-semibold">Heure Début :</span> <span id="modalTimeStart"></span></div>
+        <div><span class="font-semibold">Heure Fin :</span> <span id="modalTimeEnd"></span></div>
+        <div><span class="font-semibold">Statut :</span> <span class="px-3 py-1 rounded-full bg-green-100 text-green-800" id="modalStatus"></span></div>
+        <div class="col-span-2"><span class="font-semibold">Prix :</span> <span id="modalPrice"></span></div>
+      </div>
+
+      <div>
+        <h3 class="font-semibold text-gray-800 text-lg">Objectif</h3>
+        <p class="text-gray-600 text-md" id="modalObjectif"></p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-8 py-6 border-t flex justify-end">
+      <button id="closeModalBtn" class="btn btn-outline px-6 py-3 rounded-lg hover:bg-primary hover:text-white transition">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById("reservationModal");
+const closeModal = document.getElementById("closeModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+
+const modalDate = document.getElementById("modalDate");
+const modalTimeStart = document.getElementById("modalTimeStart");
+const modalTimeEnd = document.getElementById("modalTimeEnd");
+const modalStatus = document.getElementById("modalStatus");
+const modalPrice = document.getElementById("modalPrice");
+const modalObjectif = document.getElementById("modalObjectif");
+const modalName = document.getElementById("nameModal");
+const modalPhoto = document.getElementById("photoModal");
+
+document.querySelectorAll(".open-modal").forEach(btn => {
+    btn.addEventListener("click", () => {
+        modalDate.textContent = btn.dataset.date;
+        modalTimeStart.textContent = btn.dataset.start;
+        modalTimeEnd.textContent = btn.dataset.end;
+        modalStatus.textContent = btn.dataset.status;
+        modalPrice.textContent = btn.dataset.prix + " DH";
+        modalObjectif.textContent = btn.dataset.objectif;
+        modalName.textContent = btn.dataset.name;
+        modalPhoto.src = btn.dataset.photo || "https://via.placeholder.com/150";
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    });
+});
+
+[closeModal, closeModalBtn].forEach(btn => btn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}));
+</script>
+
+{% endblock %}

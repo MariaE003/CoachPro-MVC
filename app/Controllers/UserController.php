@@ -85,7 +85,7 @@ class UserController {
         if ($_SESSION["role"]==="coach"){
                 $coach=new Coach();
                 if ($coach->virifierSiCoachCompleterProfil($_SESSION["user_id"])) {
-                header("Location: /CoachPro-MVC/index.php");
+                header("Location: /CoachPro-MVC/public/coach/reservations");
                 exit();
             }
                 // echo 'hi my coach';
@@ -93,7 +93,7 @@ class UserController {
                 exit();
             }
 
-            header("Location: /CoachPro-MVC/index.php");
+            header("Location: /CoachPro-MVC/public/coach/reservations");
             exit();
         }
         }
